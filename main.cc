@@ -58,6 +58,8 @@ public:
         cmds.push_back(cmd);      
     }
     fclose(f);
+
+    std::cout << "Parsed " << fn << ": " << cmds.size() << " commands" << std::endl;
   }
 
   bool eof() {
@@ -122,7 +124,7 @@ public:
   }
 };
 
-class ParserError {
+class ParserSpeculationFail {
 };
 
 class QuarkBilinear {
@@ -136,7 +138,7 @@ public:
         lines.push_back(p.get());
       } while (!p.was("U") && !p.was("D"));
     } else {
-      throw ParserError();
+      throw ParserSpeculationFail();
     }
   }
 };
@@ -150,7 +152,7 @@ public:
   OperatorTerm(FileParser& p) {
 
     if (!p.is("FACTOR"))
-      throw ParserError();
+      throw ParserSpeculationFail();
 
     // get factor
     if (p.nargs()==2) {
@@ -163,7 +165,7 @@ public:
     try {
       while (!p.eof())
         qbi.push_back( QuarkBilinear( p ) );
-    } catch (ParserError pe) {
+    } catch (ParserSpeculationFail pe) {
     }
 
     while (!p.eof() && p.is("HINT:")) {
@@ -181,7 +183,7 @@ public:
     try {
       while (!p.eof())
         t.push_back( OperatorTerm( p ) );
-    } catch (ParserError pe) {
+    } catch (ParserSpeculationFail pe) {
     }
 
     if (!p.eof()) {
@@ -202,6 +204,9 @@ int main(int argc, char* argv[]) {
 
   Operator op1(p1);
   Operator op2(p2);
+
+  // now go through all combinations of operator terms and see if their hints match
+  // if so, perform wick contractions for them
 
   return 0;
 }
