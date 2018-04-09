@@ -29,7 +29,7 @@ bool match(const QuarkBilinear& a, const QuarkBilinear& b) {
 
   assert(a.lines.size());
 
-  if (a.lines[0][0].compare("BEGIN_TRACE") == 0 && compare(a.lines[0],b.lines[0]) == 0) {
+  if (a.lines[0][0].compare("BEGINTRACE") == 0 && compare(a.lines[0],b.lines[0]) == 0) {
     // do a traces compare
     for (int off=0;off<a.lines.size()-2;off++) {
       if (compare(a.lines,b.lines,1,a.lines.size()-2,off)==0)

@@ -24,13 +24,19 @@ int get_first_bilinear(OperatorTerm& t, char& fbar, char& f) {
   return -1;
 }
 
-QuarkBilinear merge(const QuarkBilinear& a, const QuarkBilinear& b) {
+std::string get_prop_type(char t) {
+  auto f = flavor_map.find(t);
+  assert(f != flavor_map.end());
+  return f->second;    
+}
+
+QuarkBilinear merge(const QuarkBilinear& a, const QuarkBilinear& b, char type) {
   QuarkBilinear r;
   int i;
   std::vector< std::string > prop;
   auto& pa = a.lines[a.lines.size()-1];
   auto& pb = b.lines[0];
-  prop.push_back("LIGHT");
+  prop.push_back(get_prop_type(type));
   for (i=1;i<pa.size();i++)
     prop.push_back(pa[i]);
   for (i=1;i<pb.size();i++)
@@ -44,23 +50,23 @@ QuarkBilinear merge(const QuarkBilinear& a, const QuarkBilinear& b) {
   return r;
 }
 
-QuarkBilinear merge(const QuarkBilinear& a) {
+QuarkBilinear merge(const QuarkBilinear& a, char type) {
   QuarkBilinear r;
   int i;
   std::vector< std::string > prop;
   auto& pa = a.lines[a.lines.size()-1];
   auto& pb = a.lines[0];
-  prop.push_back("LIGHT");
+  prop.push_back(get_prop_type(type));
   for (i=1;i<pa.size();i++)
     prop.push_back(pa[i]);
   for (i=1;i<pb.size();i++)
     prop.push_back(pb[i]);
 
-  r.lines.push_back({ "BEGIN_TRACE" });
+  r.lines.push_back({ "BEGINTRACE" });
   for (i=1;i<a.lines.size()-1;i++)
     r.lines.push_back(a.lines[i]);
   r.lines.push_back(prop);
-  r.lines.push_back({ "END_TRACE" });
+  r.lines.push_back({ "ENDTRACE" });
   return r;
 }
 
@@ -88,9 +94,9 @@ void add_wick(Operator& r, OperatorTerm t) {
         if (l != i && l != j)
           tm.qbi.push_back(t.qbi[l]);
       if (i==j)
-        tm.qbi.push_back(merge(t.qbi[i]));
+        tm.qbi.push_back(merge(t.qbi[i],f));
       else
-        tm.qbi.push_back(merge(t.qbi[i],t.qbi[j]));
+        tm.qbi.push_back(merge(t.qbi[i],t.qbi[j],f));
       add_wick(r,tm);
     }
   }

@@ -12,6 +12,8 @@
 #include <sstream>
 #include <map>
 
+std::map< char, std::string > flavor_map = { {'U',"LIGHT"}, {'D',"LIGHT"}, {'S',"STRANGE"} };
+
 typedef std::complex<double> Complex;
 
 #include "Parser.h"
