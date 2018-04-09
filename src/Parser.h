@@ -1,18 +1,8 @@
 /*
-  Wick contractor
+  Wick contractor - Parser
   Author: Christoph Lehner
   Date: 2018
 */
-#include <stdio.h>
-#include <vector>
-#include <iostream>
-#include <complex>
-#include <assert.h>
-#include <iterator>
-#include <sstream>
-
-typedef std::complex<double> Complex;
-
 template<typename Out>
 void split(const std::string &s, char delim, Out result) {
   std::stringstream ss;
@@ -59,7 +49,7 @@ public:
     }
     fclose(f);
 
-    std::cout << "Parsed " << fn << ": " << cmds.size() << " commands" << std::endl;
+    std::cout << "# Parsed " << fn << ": " << cmds.size() << " commands" << std::endl;
   }
 
   bool eof() {
@@ -108,7 +98,7 @@ public:
     return cmds[pos].size() - 1;
   }
 
-  void dump() {
+  void dump() const {
     std::cout << "FileParser {" << std::endl;
     for (size_t i=0;i<cmds.size();i++) {
       auto c = cmds[i];
@@ -126,87 +116,3 @@ public:
 
 class ParserSpeculationFail {
 };
-
-class QuarkBilinear {
-public:
-
-  std::vector< std::vector< std::string > > lines;
-
-  QuarkBilinear(FileParser& p) {
-    if (p.is("UBAR") || p.is("DBAR")) {
-      do {
-        lines.push_back(p.get());
-      } while (!p.was("U") && !p.was("D"));
-    } else {
-      throw ParserSpeculationFail();
-    }
-  }
-};
-
-class OperatorTerm {
-public:
-  Complex factor;
-  std::vector<QuarkBilinear> qbi;
-  std::vector< std::vector<std::string> > hints;
-
-  OperatorTerm(FileParser& p) {
-
-    if (!p.is("FACTOR"))
-      throw ParserSpeculationFail();
-
-    // get factor
-    if (p.nargs()==2) {
-      factor = Complex(p.get<double>(1),p.get<double>(2));
-    } else {
-      factor = p.get<double>(1);
-    }
-    p.next();
-
-    try {
-      while (!p.eof())
-        qbi.push_back( QuarkBilinear( p ) );
-    } catch (ParserSpeculationFail pe) {
-    }
-
-    while (!p.eof() && p.is("HINT:")) {
-      hints.push_back(p.get());
-    }
-  }
-};
-
-class Operator {
-public:
-  std::vector<OperatorTerm> t;
-
-  Operator(FileParser& p) {
-
-    try {
-      while (!p.eof())
-        t.push_back( OperatorTerm( p ) );
-    } catch (ParserSpeculationFail pe) {
-    }
-
-    if (!p.eof()) {
-      p.dump();
-      assert(0);
-    }
-
-  }
-
-};
-
-int main(int argc, char* argv[]) {
-  if (argc < 3)
-    return 1;
-  
-  FileParser p1(argv[1]);
-  FileParser p2(argv[2]);
-
-  Operator op1(p1);
-  Operator op2(p2);
-
-  // now go through all combinations of operator terms and see if their hints match
-  // if so, perform wick contractions for them
-
-  return 0;
-}
