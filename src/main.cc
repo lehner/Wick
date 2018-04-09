@@ -51,10 +51,21 @@ bool hints_match(T& a, T& b) {
 int main(int argc, char* argv[]) {
   if (argc < 3)
     return 1;
-  
+
   FileParser p1(argv[1]);
   FileParser p2(argv[2]);
 
+  // get additional parameters
+  for (int i=3;i<argc;i++) {
+    if (!strcmp(argv[i],"--replace_right")) {
+      assert(i+2 < argc);
+      p2.replace(argv[i+1],argv[i+2]);
+    } else if (!strcmp(argv[i],"--replace_left")) {
+      assert(i+2 < argc);
+      p1.replace(argv[i+1],argv[i+2]);
+    }
+  }
+      
   Operator op1(p1);
   Operator op2(p2);
 
@@ -70,6 +81,15 @@ int main(int argc, char* argv[]) {
 
   // simplify result
   res.simplify();
+
+  // get additional parameters
+  for (int i=3;i<argc;i++) {
+    if (!strcmp(argv[i],"--avoid_source")) {
+      assert(i+1 < argc);
+      // TODO
+    }
+  }
+
   res.write(stdout);
 
   return 0;

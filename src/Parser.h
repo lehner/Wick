@@ -33,6 +33,18 @@ public:
   std::vector< std::vector<std::string> > cmds;
   size_t pos;
 
+  void replace(const char* a, const char* b) {
+    for (auto& i : cmds) {
+      for (auto& j : i) {
+        if (!strcmp(a,j.c_str()))
+          j=b;
+      }
+      i.erase(std::remove_if(i.begin(),i.end(),
+                             [](std::string const& s) { return s.size() == 0; }),
+              i.end());
+    }
+  }
+
   FileParser(const char* fn) : pos(0) {
     FILE* f = fopen(fn,"rt");
     assert(f);
