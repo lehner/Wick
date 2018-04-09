@@ -20,6 +20,7 @@ typedef std::complex<double> Complex;
 #include "Simplify.h"
 #include "Operator.h"
 #include "Wick.h"
+#include "Optimize.h"
 
 Complex sp(std::vector<Complex>& a, std::vector<Complex>& b) {
   assert(a.size() == b.size());
@@ -86,9 +87,12 @@ int main(int argc, char* argv[]) {
   for (int i=3;i<argc;i++) {
     if (!strcmp(argv[i],"--avoid_source")) {
       assert(i+1 < argc);
-      // TODO
+      res.apply_bilinear([argv,i](QuarkBilinear& b) { replace_source(b,argv[i+1]); });
     }
   }
+
+  // identify combined operators
+  res.apply_bilinear(replace_combined_operators);
 
   res.write(stdout);
 

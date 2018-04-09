@@ -24,6 +24,15 @@ public:
   Operator() {
   }
 
+  template<typename F>
+  void apply_bilinear(F f) {
+    for (auto& i : t) {
+      for (auto& b : i.qbi) {
+        f(b);
+      }
+    }
+  }
+
   void simplify() {
     for (int i=(int)t.size()-1;i>=0;i--) {
       int j;
