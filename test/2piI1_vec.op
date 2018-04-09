@@ -3,7 +3,7 @@
 ## assuming momenta index 0-5 correspond to ordering +x,+y,+z,-x,-y,-z
 ##
 
-FACTOR 1.0
+FACTOR 0.7071067811865475
  UBAR t local
  GAMMA mu
  U t local
@@ -17,7 +17,7 @@ FACTOR 1.0
  #0P000T1M2[ 0  0  1  0  0 -1]
 
 
-FACTOR -1.0
+FACTOR -0.7071067811865475
  DBAR t local
  GAMMA mu
  D t local
