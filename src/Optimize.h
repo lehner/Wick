@@ -26,7 +26,7 @@ void replace_source(QuarkBilinear& qbi, char* tsrc) {
 bool is_prop_sl(std::vector<std::string>& c, std::string& t0, std::string& t1) {
   if (c.size() != 4)
     return false;
-  if (is_prop_type(c[0]))
+  if (!is_prop_type(c[0]))
     return false;
   if (c[3].compare("local"))
     return false;
@@ -38,7 +38,7 @@ bool is_prop_sl(std::vector<std::string>& c, std::string& t0, std::string& t1) {
 bool is_prop_ls(std::vector<std::string>& c, std::string& t0, std::string& t1) {
   if (c.size() != 4)
     return false;
-  if (is_prop_type(c[0]))
+  if (!is_prop_type(c[0]))
     return false;
   if (c[2].compare("local"))
     return false;

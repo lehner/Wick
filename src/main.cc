@@ -55,6 +55,12 @@ int main(int argc, char* argv[]) {
   if (argc < 3)
     return 1;
 
+  // write input as output
+  printf("#");
+  for (int i=0;i<argc;i++)
+    printf(" %s",argv[i]);
+  printf("\n#\n");
+
   FileParser p1(argv[1]);
   FileParser p2(argv[2]);
 
@@ -83,7 +89,11 @@ int main(int argc, char* argv[]) {
   }
 
   // simplify result
+  printf("#\n");
+  printf("# %d term(s) before simplification\n",(int)res.t.size());
   res.simplify();
+  printf("# %d term(s) after simplification\n",(int)res.t.size());
+  printf("#\n");
 
   // get additional parameters
   for (int i=3;i<argc;i++) {
@@ -96,6 +106,7 @@ int main(int argc, char* argv[]) {
   // identify combined operators
   res.apply_bilinear(replace_combined_operators);
 
+  printf("\n");
   res.write(stdout);
 
   return 0;
