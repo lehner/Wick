@@ -81,15 +81,19 @@ int main(int argc, char* argv[]) {
   // now go through all combinations of operator terms and see if their hints match
   // if so, perform wick contractions for them
   Operator res;
+  int s_a(0), s_t(0);
   for (auto& ot1 : op1.t) {
     for (auto& ot2 : op2.t) {
-      if (hints_match(ot1.hints,ot2.hints))
-        add_wick(res,ot1*ot2);
+      if (hints_match(ot1.hints,ot2.hints)) {
+        add_wick(res,ot1*ot2); s_a++;
+      }
+      s_t++;
     }
   }
 
   // simplify result
   printf("#\n");
+  printf("# %d / %d combinations have matching hints\n",s_a,s_t);
   printf("# %d term(s) before simplification\n",(int)res.t.size());
   res.simplify();
   printf("# %d term(s) after simplification\n",(int)res.t.size());
