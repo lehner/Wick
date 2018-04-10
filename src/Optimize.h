@@ -47,19 +47,18 @@ bool is_prop_ls(std::vector<std::string>& c, std::string& t0, std::string& t1) {
   return true;
 }
 
-bool is_gamma(std::vector<std::string>& c, std::string& mu, std::string& t) {
-  if (c.size() != 3)
+bool is_gamma(std::vector<std::string>& c, std::string& mu) {
+  if (c.size() != 2)
     return false;
   if (c[0].compare("GAMMA"))
     return false;
   mu = c[1];
-  t = c[2];
   return true;
 }
 
 void replace_combined_operators(QuarkBilinear& qbi) {
   std::vector< std::vector< std::string > > lines;
-  std::string t0,t1,t2,t3,mu,tgamma;
+  std::string t0,t1,t2,t3,mu;
 
   std::vector< std::string > hash;
   hash.push_back("#");
@@ -73,10 +72,9 @@ void replace_combined_operators(QuarkBilinear& qbi) {
       int ipp = (i + 2) % n;
 
       if (is_prop_sl(qbi.lines[1+i],t0,t1) &&
-          is_gamma(qbi.lines[1+ip],mu,tgamma) &&
+          is_gamma(qbi.lines[1+ip],mu) &&
           is_prop_ls(qbi.lines[1+ipp],t2,t3) &&
-          t1.compare(t2) == 0 &&
-          tgamma.compare(t1) == 0) {
+          t1.compare(t2) == 0) {
 
         std::vector< std::string > op;
         op.push_back(qbi.lines[1+i][0] + "_LGAMMA_" + qbi.lines[1+ipp][0]);
