@@ -22,14 +22,22 @@ public:
       i.write(f);
   }
 
-  void parse_hint(std::string h) {
-    auto a = split(h,'[');
-    assert(a.size()==2);
-    auto a2 = split(a[1],',');
+  void parse_hint(std::vector<std::string> h) {
+    assert(h.size() > 2);
+    std::string name = h[1];
     std::vector<Complex> v;
-    for (size_t i=0;i<a2.size();i++)
-      v.push_back(atof(a2[i].c_str()));
-    hints[a[0]] = v;
+    for (size_t i=2;i<h.size();i++) {
+      auto a = split(h[i],',');
+      if (a.size() == 1) {
+        v.push_back(atof(a[0].c_str()));
+      } else if (a.size() == 2) {
+        v.push_back(Complex(atof(a[0].c_str()),atof(a[1].c_str())));
+      } else {
+        assert(0);
+      }
+    }
+
+    hints[name] = v;
   }
 
   OperatorTerm operator*(const OperatorTerm& b) const {
@@ -62,10 +70,8 @@ public:
     } catch (ParserSpeculationFail pe) {
     }
 
-    while (!p.eof() && p.is("HINT:")) {
-      auto& a = p.get();
-      for (size_t i=1;i<a.size();i++)
-        parse_hint(a[i]);
+    while (!p.eof() && p.is("HINT")) {
+      parse_hint(p.get());
     }
   }
 };

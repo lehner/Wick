@@ -6,11 +6,11 @@
 FACTOR 0.7071067811865475
  UBAR t local
  GAMMA mu
- MOM p_100_type_p0
+ MOM p_100_type_p0 t
  D t local
  DBAR t local
  GAMMA mu
- MOM p_100_type_n0
+ MOM p_100_type_n0 t
  U t local
  HINT: 0P000A1P0[1,1,1,1,1,1] 0P000EEP0[1,1,-2,1,1,-2] 0P000EEP1[1,-1,0,1,-1,0] 0P000T1M0[1,0,0,-1,0,0] 0P000T1M1[0,1,0,0,-1,0] 0P000T1M2[0,0,1,0,0,-1]
  #HINT:
@@ -24,11 +24,11 @@ FACTOR 0.7071067811865475
 FACTOR -0.7071067811865475
  DBAR t local
  GAMMA mu
- MOM p_100_type_p0
+ MOM p_100_type_p0 t
  U t local
  UBAR t local
  GAMMA mu
- MOM p_100_type_n0
+ MOM p_100_type_n0 t
  D t local
  HINT: 0P000A1P0[1,1,1,1,1,1] 0P000EEP0[1,1,-2,1,1,-2] 0P000EEP1[1,-1,0,1,-1,0] 0P000T1M0[1,0,0,-1,0,0] 0P000T1M1[0,1,0,0,-1,0] 0P000T1M2[0,0,1,0,0,-1]
 
