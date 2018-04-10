@@ -1,0 +1,58 @@
+#!/bin/bash
+
+ops=(
+"lvec"
+"svec"
+"2piI1_P100"
+"2piI1_P110"
+"2piI1_P111"
+"2piI1_P200"
+)
+
+files=(
+"vec"
+"vec"
+"2piI1_P100"
+"2piI1_P110"
+"2piI1_P111"
+"2piI1_P200"
+)
+
+args=(
+""
+'--replace_POS local \\\"\\\"'
+'--replace_POS local \\\"\\\"'
+'--replace_POS local \\\"\\\"'
+'--replace_POS local \\\"\\\"'
+'--replace_POS local \\\"\\\"'
+)
+
+n=${#ops[@]}
+for ((i=0;i<n;i++))
+do
+
+    eval "opL=\"${ops[$i]}\""
+    eval "fileL=\"${files[$i]}\""
+    eval "argL=\"${args[$i]}\""
+    argL=$(echo $argL | sed 's/POS/left/g')
+
+    for ((j=i;j<n;j++))
+    do
+        
+            eval "opR=\"${ops[$j]}\""
+            eval "fileR=\"${files[$j]}\""
+            eval "argR=\"${args[$j]}\""
+            argR=$(echo $argR | sed 's/POS/right/g')
+
+            eval "exe=\"../wick ../operators/${fileL}.op ../operators/${fileR}.op $argL $argR --replace_right t t0 --avoid_source t\""
+            eval "$exe > ${opL}-${opR}.contr"
+            cat ${opL}-${opR}.contr | awk 'BEGIN{ hasTsrc=0; }{
+ if ($1=="LIGHT" && $(NF) == "t")hasTsrc=1;
+ if ($1=="LIGHTBAR" && $2 == "t")hasTsrc=1;
+}END{ print "hasTsrc " hasTsrc; }' > ${opL}-${opR}.flags
+    done
+
+done
+
+# remove ones that we can do better with other methods
+rm -f lvec-lvec.*
