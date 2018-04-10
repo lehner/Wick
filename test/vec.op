@@ -1,7 +1,5 @@
-## 2pi operator, I=1, 0 total momentum, back-to-back 100 momentum
-## Gamma_5 for both pions
-## assuming momenta index 0-5 correspond to ordering +x,+y,+z,-x,-y,-z
-##
+## Vector operator
+
 
 FACTOR 0.0 0.4082482904638630
  UBAR t local
