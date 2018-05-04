@@ -44,15 +44,22 @@ do
             eval "argR=\"${args[$j]}\""
             argR=$(echo $argR | sed 's/POS/right/g')
 
-            eval "exe=\"../wick ../operators/${fileL}.op ../operators/${fileR}.op $argL $argR --replace_right t t0 --avoid_source t\""
-            eval "$exe > ${opL}-${opR}.contr"
-            cat ${opL}-${opR}.contr | awk 'BEGIN{ hasTsrc=0; }{
+	    for ((m=0;m<3;m++))
+	    do
+		dst=000_T1M_${m}
+
+		mkdir -p $dst
+		eval "exe=\"../wick ../operators/${fileL}.$dst ../operators/${fileR}.$dst $argL $argR --replace_right t t0 --avoid_source t\""
+		echo $exe
+		eval "$exe > $dst/${opL}-${opR}.contr"
+		cat $dst/${opL}-${opR}.contr | awk 'BEGIN{ hasTsrc=0; }{
  if ($1=="LIGHT" && $(NF) == "t")hasTsrc=1;
  if ($1=="LIGHTBAR" && $2 == "t")hasTsrc=1;
-}END{ print "hasTsrc " hasTsrc; }' > ${opL}-${opR}.flags
+}END{ print "hasTsrc " hasTsrc; }' > $dst/${opL}-${opR}.flags
+	    done
     done
 
 done
 
 # remove ones that we can do better with other methods
-rm -f lvec-lvec.*
+rm -f */lvec-lvec.*

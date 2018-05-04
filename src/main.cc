@@ -11,6 +11,8 @@
 #include <iterator>
 #include <sstream>
 #include <map>
+#include <algorithm>
+#include <string.h>
 
 std::map< char, std::string > flavor_map = { {'U',"LIGHT"}, {'D',"LIGHT"}, {'S',"STRANGE"} };
 
@@ -61,36 +63,66 @@ int main(int argc, char* argv[]) {
     printf(" %s",argv[i]);
   printf("\n#\n");
 
-  FileParser p1(argv[1]);
-  FileParser p2(argv[2]);
-
-  // get additional parameters
-  for (int i=3;i<argc;i++) {
-    if (!strcmp(argv[i],"--replace_right")) {
-      assert(i+2 < argc);
-      p2.replace(argv[i+1],argv[i+2]);
-    } else if (!strcmp(argv[i],"--replace_left")) {
-      assert(i+2 < argc);
-      p1.replace(argv[i+1],argv[i+2]);
-    }
+  int nops;
+  if (!strncmp(argv[2],"--",2)) {
+    nops = 1;
+  } else {
+    nops = 2;
   }
-      
-  Operator op1(p1);
-  Operator op2(p2);
 
-  // now go through all combinations of operator terms and see if their hints match
-  // if so, perform wick contractions for them
   Operator res;
   int s_a(0), s_t(0);
-  for (auto& ot1 : op1.t) {
-    for (auto& ot2 : op2.t) {
-      if (hints_match(ot1.hints,ot2.hints)) {
-        add_wick(res,ot1*ot2); s_a++;
+    
+  if (nops == 2) {
+    FileParser p1(argv[1]);
+    FileParser p2(argv[2]);
+    
+    // get additional parameters
+    for (int i=nops+1;i<argc;i++) {
+      if (!strcmp(argv[i],"--replace_right")) {
+	assert(i+2 < argc);
+	p2.replace(argv[i+1],argv[i+2]);
+      } else if (!strcmp(argv[i],"--replace_left")) {
+	assert(i+2 < argc);
+	p1.replace(argv[i+1],argv[i+2]);
       }
+    }
+    
+    Operator op1(p1);
+    Operator op2(p2);
+    
+    // now go through all combinations of operator terms and see if their hints match
+    // if so, perform wick contractions for them
+    for (auto& ot1 : op1.t) {
+      for (auto& ot2 : op2.t) {
+	if (hints_match(ot1.hints,ot2.hints)) {
+	  add_wick(res,ot1*ot2); s_a++;
+	}
+	s_t++;
+      }
+    }
+  } else if (nops == 1) {
+    FileParser p1(argv[1]);
+    
+    // get additional parameters
+    for (int i=nops+1;i<argc;i++) {
+      if (!strcmp(argv[i],"--replace_left")) {
+	assert(i+2 < argc);
+	p1.replace(argv[i+1],argv[i+2]);
+      }
+    }
+    
+    Operator op1(p1);
+    for (auto& ot1 : op1.t) {
+      add_wick(res,ot1); 
+      s_a++;
       s_t++;
     }
+  } else {
+    printf("# Nops = %d not yet implemented!\n",nops);
+    return 2;
   }
-
+    
   // simplify result
   printf("#\n");
   printf("# %d / %d combinations have matching hints\n",s_a,s_t);
@@ -100,7 +132,7 @@ int main(int argc, char* argv[]) {
   printf("#\n");
 
   // get additional parameters
-  for (int i=3;i<argc;i++) {
+  for (int i=nops+1;i<argc;i++) {
     if (!strcmp(argv[i],"--avoid_source")) {
       assert(i+1 < argc);
       res.apply_bilinear([argv,i](QuarkBilinear& b) { replace_source(b,argv[i+1]); });

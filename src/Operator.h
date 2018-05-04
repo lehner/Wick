@@ -48,7 +48,7 @@ public:
 
     // now remove all zeros
     for (int i=(int)t.size()-1;i>=0;i--)
-      if (norm(t[i].factor) < 1e-100)
+      if (norm(t[i].factor) < 1e-28)
         t.erase(t.begin() + i);
   }
 
