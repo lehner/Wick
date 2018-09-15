@@ -36,10 +36,9 @@ bool match(const QuarkBilinear& a, const QuarkBilinear& b) {
         return true;
     }
   } else {
-    std::cout << "Match:" << std::endl;
-    a.dump();
-    b.dump();
-    assert(0); // right now only handle full traces
+
+    if (compare(a.lines,b.lines,0,a.lines.size(),0)==0)
+      return true;
   }
 
   return false;
@@ -65,4 +64,21 @@ bool match(const OperatorTerm& a, const OperatorTerm& b) {
     }
   }
   return true;
+}
+
+std::string join(const std::vector<std::string>& vec, const char* delim) {
+  std::stringstream res;
+  std::copy(vec.begin(), vec.end(), std::ostream_iterator<std::string>(res, delim));
+  return res.str();
+}
+
+std::string get_hash(const OperatorTerm& t) {
+  std::vector<std::string> sz;
+  for (const auto & i : t.qbi) {
+    for (const auto & l : i.lines) {
+      sz.push_back(join(l," "));
+    }
+  }
+  sort(sz.begin(),sz.end());
+  return join(sz,"|");
 }

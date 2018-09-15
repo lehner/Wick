@@ -64,11 +64,11 @@ int main(int argc, char* argv[]) {
   printf("\n#\n");
 
   int nops;
-  if (!strncmp(argv[2],"--",2)) {
-    nops = 1;
-  } else {
-    nops = 2;
+  for (nops=1;nops<argc;nops++) {
+    if (!strncmp(argv[nops],"--",2))
+      break;
   }
+  nops--;
 
   Operator res;
   int s_a(0), s_t(0);
@@ -77,8 +77,8 @@ int main(int argc, char* argv[]) {
     FileParser p1(argv[1]);
     FileParser p2(argv[2]);
     
-    // get additional parameters
-    for (int i=nops+1;i<argc;i++) {
+    // get additional parameters 
+   for (int i=nops+1;i<argc;i++) {
       if (!strcmp(argv[i],"--replace_right")) {
 	assert(i+2 < argc);
 	p2.replace(argv[i+1],argv[i+2]);
@@ -99,6 +99,48 @@ int main(int argc, char* argv[]) {
 	  add_wick(res,ot1*ot2); s_a++;
 	}
 	s_t++;
+      }
+    }
+  } else if (nops == 3) {
+    FileParser p1(argv[1]);
+    FileParser p2(argv[2]);
+    FileParser p3(argv[3]);
+    
+    Operator op1(p1);
+    Operator op2(p2);
+    Operator op3(p3);
+    
+    // now go through all combinations of operator terms and see if their hints match
+    // if so, perform wick contractions for them
+    for (auto& ot1 : op1.t) {
+      for (auto& ot2 : op2.t) {
+	for (auto& ot3 : op3.t) {
+	  add_wick(res,ot1*ot2*ot3); s_a++;
+	  s_t++;
+	}
+      }
+    }
+  } else if (nops == 4) {
+    FileParser p1(argv[1]);
+    FileParser p2(argv[2]);
+    FileParser p3(argv[3]);
+    FileParser p4(argv[4]);
+    
+    Operator op1(p1);
+    Operator op2(p2);
+    Operator op3(p3);
+    Operator op4(p4);
+    
+    // now go through all combinations of operator terms and see if their hints match
+    // if so, perform wick contractions for them
+    for (auto& ot1 : op1.t) {
+      for (auto& ot2 : op2.t) {
+	for (auto& ot3 : op3.t) {
+	  for (auto& ot4 : op4.t) {
+	    add_wick(res,ot1*ot2*ot3*ot4); s_a++;
+	    s_t++;
+	  }
+	}
       }
     }
   } else if (nops == 1) {
@@ -127,6 +169,8 @@ int main(int argc, char* argv[]) {
   printf("#\n");
   printf("# %d / %d combinations have matching hints\n",s_a,s_t);
   printf("# %d term(s) before simplification\n",(int)res.t.size());
+  res.simplify_with_heuristics();
+  printf("# %d term(s) after simplification with heuristics\n",(int)res.t.size());
   res.simplify();
   printf("# %d term(s) after simplification\n",(int)res.t.size());
   printf("#\n");
