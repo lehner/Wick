@@ -61,7 +61,10 @@ public:
     }
     fclose(f);
 
-    std::cout << "# Parsed " << fn << ": " << cmds.size() << " commands" << std::endl;
+#ifdef MPI_VERSION
+    if (!mpi_id)
+      std::cout << "# Parsed " << fn << ": " << cmds.size() << " commands" << std::endl;
+#endif
   }
 
   bool eof() {

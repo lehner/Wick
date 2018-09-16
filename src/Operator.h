@@ -55,26 +55,60 @@ public:
       int n0 = (int)grps[i].t.size();
       grps[i].simplify();
       int n = (int)grps[i].t.size();
-      printf("# group %d / %d with %d elements simplified to %d elements\n",i,(int)grps.size(),
-	     n0,n);
+      if (!mpi_id)
+	printf("# group %d / %d with %d elements simplified to %d elements\n",i,(int)grps.size(),
+	       n0,n);
       for (auto & ti : grps[i].t)
 	t.push_back(ti);
     }
   }
 
   void simplify() {
-    // strategy: first find list of matches which can be done in parallel
-    // then act on them
-    for (int i=(int)t.size()-1;i>=0;i--) {
+
+    std::vector<int> n_rank_matches(mpi_n);
+    int i = (int)t.size() - 1;
+    while (i > 0) {
+      // logic: for each match group, let only element with lowest index survive
+
+      // first step: get all matches for element i
+      std::vector<int> lmatches;
       int j;
-      for (j=0;j<i;j++) {
+      int i_per_rank = i / mpi_n;
+      if (i_per_rank*mpi_n < i)
+	i_per_rank++;
+      assert(i_per_rank*mpi_n >= i);
+      for (j=i_per_rank*mpi_id;j<i_per_rank*(mpi_id+1);j++) { // don't break ordering!!
+	if (j>=i)
+	  break;
         if (match(t[i],t[j]))
-          break;
+	  lmatches.push_back(j);
       }
-      if (j != i) {
-        t[j].factor += t[i].factor;
-        t.erase(t.begin() + i);
+      // gather matches
+      int nrank = (int)lmatches.size();
+      MPI_Allgather(&nrank,1,MPI_INT,&n_rank_matches[0],1,MPI_INT,MPI_COMM_WORLD);
+      int n = 0;
+      for (j=0;j<mpi_n;j++)
+	n += n_rank_matches[j];
+      std::vector<int> _matches(n,0), matches(n,0);
+      n = 0;
+      for (j=0;j<mpi_id;j++)
+	n += n_rank_matches[j];
+      for (j=0;j<(int)lmatches.size();j++)
+	_matches[n+j]=lmatches[j];
+      MPI_Allreduce(&_matches[0],&matches[0],(int)matches.size(),MPI_INT,MPI_SUM,MPI_COMM_WORLD);
+      matches.push_back(i);
+
+      if (matches.size() > 1) {
+	int survivor = matches[0];
+	for (j=(int)matches.size()-1;j>0;j--) {
+	  int dup = matches[j];
+	  t[survivor].factor += t[dup].factor;
+	  t.erase(t.begin() + dup);
+	}
+	i++;
       }
+
+      i -= (int)matches.size();
     }
 
     // now remove all zeros

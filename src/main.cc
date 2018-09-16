@@ -13,6 +13,8 @@
 #include <map>
 #include <algorithm>
 #include <string.h>
+#include <mpi.h>
+int mpi_id, mpi_n;
 
 std::map< char, std::string > flavor_map = { {'U',"LIGHT"}, {'D',"LIGHT"}, {'S',"STRANGE"} };
 
@@ -57,11 +59,19 @@ int main(int argc, char* argv[]) {
   if (argc < 3)
     return 1;
 
-  // write input as output
-  printf("#");
-  for (int i=0;i<argc;i++)
-    printf(" %s",argv[i]);
-  printf("\n#\n");
+  MPI_Init(&argc,&argv);
+  MPI_Comm_size (MPI_COMM_WORLD,&mpi_n);
+  MPI_Comm_rank (MPI_COMM_WORLD, &mpi_id);
+
+  if (!mpi_id) {
+    // write input as output
+    printf("#");
+    for (int i=0;i<argc;i++)
+      printf(" %s",argv[i]);
+    printf("\n#\n");
+    printf("# MPI with %d ranks\n",mpi_n);
+    printf("#\n");
+  }
 
   int nops;
   for (nops=1;nops<argc;nops++) {
@@ -161,20 +171,25 @@ int main(int argc, char* argv[]) {
       s_t++;
     }
   } else {
-    printf("# Nops = %d not yet implemented!\n",nops);
+    if (!mpi_id)
+      printf("# Nops = %d not yet implemented!\n",nops);
     return 2;
   }
     
-  // simplify result
-  printf("#\n");
-  printf("# %d / %d combinations have matching hints\n",s_a,s_t);
-  printf("# %d term(s) before simplification\n",(int)res.t.size());
+  if (!mpi_id) {
+    // simplify result
+    printf("#\n");
+    printf("# %d / %d combinations have matching hints\n",s_a,s_t);
+    printf("# %d term(s) before simplification\n",(int)res.t.size());
+  }
   res.simplify_with_heuristics();
-  printf("# %d term(s) after simplification with heuristics\n",(int)res.t.size());
+  if (!mpi_id)
+    printf("# %d term(s) after simplification with heuristics\n",(int)res.t.size());
   res.simplify();
-  printf("# %d term(s) after simplification\n",(int)res.t.size());
-  printf("#\n");
-
+  if (!mpi_id) {
+    printf("# %d term(s) after simplification\n",(int)res.t.size());
+    printf("#\n");
+  }
   // get additional parameters
   for (int i=nops+1;i<argc;i++) {
     if (!strcmp(argv[i],"--avoid_source")) {
@@ -186,8 +201,11 @@ int main(int argc, char* argv[]) {
   // identify combined operators
   res.apply_bilinear(replace_combined_operators);
 
-  printf("\n");
-  res.write(stdout);
+  if (!mpi_id) {
+    printf("\n");
+    res.write(stdout);
+  }
 
+  MPI_Finalize();
   return 0;
 }
