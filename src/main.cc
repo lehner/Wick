@@ -88,13 +88,23 @@ int main(int argc, char* argv[]) {
     FileParser p2(argv[2]);
     
     // get additional parameters 
-   for (int i=nops+1;i<argc;i++) {
+    bool ignore_hints = false;
+    bool invert_hints = false;
+    for (int i=nops+1;i<argc;i++) {
       if (!strcmp(argv[i],"--replace_right")) {
 	assert(i+2 < argc);
 	p2.replace(argv[i+1],argv[i+2]);
       } else if (!strcmp(argv[i],"--replace_left")) {
 	assert(i+2 < argc);
 	p1.replace(argv[i+1],argv[i+2]);
+      } else if (!strcmp(argv[i],"--ignore_hints")) {
+	if (!mpi_id)
+	  printf("# ignore hints\n");
+	ignore_hints=true;
+      } else if (!strcmp(argv[i],"--invert_hints")) {
+	if (!mpi_id)
+	  printf("# invert hints\n");
+	invert_hints=true;
       }
     }
     
@@ -105,7 +115,10 @@ int main(int argc, char* argv[]) {
     // if so, perform wick contractions for them
     for (auto& ot1 : op1.t) {
       for (auto& ot2 : op2.t) {
-	if (hints_match(ot1.hints,ot2.hints)) {
+	bool h = ignore_hints || hints_match(ot1.hints,ot2.hints);
+	if (invert_hints)
+	  h=!h;
+	if (h) {
 	  add_wick(res,ot1*ot2); s_a++;
 	}
 	s_t++;

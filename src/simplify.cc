@@ -13,6 +13,8 @@
 #include <map>
 #include <algorithm>
 #include <string.h>
+#include <mpi.h>
+int mpi_id, mpi_n;
 
 std::map< char, std::string > flavor_map = { {'U',"LIGHT"}, {'D',"LIGHT"}, {'S',"STRANGE"} };
 
@@ -57,6 +59,10 @@ int main(int argc, char* argv[]) {
   if (argc < 2)
     return 1;
 
+  MPI_Init(&argc,&argv);
+  MPI_Comm_size (MPI_COMM_WORLD,&mpi_n);
+  MPI_Comm_rank (MPI_COMM_WORLD, &mpi_id);
+
   FileParser p1(argv[1]);
   Operator op1(p1);  
 
@@ -64,7 +70,11 @@ int main(int argc, char* argv[]) {
   op1.simplify();
   size_t nsimpl = op1.t.size();
 
-  std::cout << "# Simplified " << norig << " to " << nsimpl << " terms" << std::endl;
-  op1.write(stdout);
+  if (!mpi_id) {
+    std::cout << "# Simplified " << norig << " to " << nsimpl << " terms" << std::endl;
+    op1.write(stdout);
+  }
+
+  MPI_Finalize();
   return 0;
 }

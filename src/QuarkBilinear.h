@@ -32,6 +32,10 @@ public:
       do {
         lines.push_back(p.get());
       } while (!p.was("U") && !p.was("D"));
+    } else if (p.is("BEGINTRACE")) {
+      do {
+        lines.push_back(p.get());
+      } while (!p.was("ENDTRACE"));
     } else {
       throw ParserSpeculationFail();
     }
