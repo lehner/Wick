@@ -69,9 +69,18 @@ int main(int argc, char* argv[]) {
   size_t norig = op1.t.size();
   op1.simplify();
   size_t nsimpl = op1.t.size();
+  auto defs = op1.cse();
 
   if (!mpi_id) {
     std::cout << "# Simplified " << norig << " to " << nsimpl << " terms" << std::endl;
+    std::cout << "# CSE defines " << defs.size() << " terms" << std::endl;
+    
+    for (auto& d : defs) {
+      printf("\nBEGINDEFINE\n");
+      d.second.write(stdout);
+      printf("ENDDEFINE %s\n\n",d.first.c_str());
+    }
+
     op1.write(stdout);
   }
 
