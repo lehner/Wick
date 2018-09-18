@@ -79,9 +79,15 @@ int main(int argc, char* argv[]) {
     std::cout << "# CSE defines " << defs.size() << " terms" << std::endl;
     
     for (auto& d : defs) {
-      printf("\nBEGINDEFINE\n");
-      d.second.write(stdout);
-      printf("ENDDEFINE %s\n\n",d.first.c_str());
+      if (!d.second.lines[0][0].compare("BEGINTRACE")) {
+	printf("\nBEGINDEFINE\n");
+	d.second.write(stdout);
+	printf("ENDDEFINE %s\n\n",d.first.c_str());
+      } else {
+	printf("\nBEGINMDEFINE\n");
+	d.second.write(stdout);
+	printf("ENDMDEFINE %s\n\n",d.first.c_str());
+      }
     }
 
     op1.write(stdout);
