@@ -114,9 +114,9 @@ void replace_pair(QuarkBilinear& qbi, std::string key, std::string tag) {
     if (!get_pair_key(qbi,i).compare(key)) {
       qbi.lines.erase(qbi.lines.begin() + i + 1);
       if (i==N - 1)
-	qbi.lines[0+1] = { "EVAL", tag };
+	qbi.lines[0+1] = { "EVALM", tag };
       else
-	qbi.lines[i+1] = { "EVAL", tag };
+	qbi.lines[i+1] = { "EVALM", tag };
       i--;
       N--;
     }
