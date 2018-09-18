@@ -67,7 +67,7 @@ public:
 	    }
 	  }
 	  if (!has) {
-	    sprintf(tag,"CSE%5.5d",idx++);
+	    sprintf(tag,"CS%5.5d",idx++);
 	    std::string st = prefix + tag;
 	    ret[st] = qb;
 	    qb.lines.clear();

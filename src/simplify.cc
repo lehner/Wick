@@ -69,7 +69,10 @@ int main(int argc, char* argv[]) {
   size_t norig = op1.t.size();
   op1.simplify();
   size_t nsimpl = op1.t.size();
+
   auto defs = op1.cse();
+
+  cse_steps(defs,2);
 
   if (!mpi_id) {
     std::cout << "# Simplified " << norig << " to " << nsimpl << " terms" << std::endl;

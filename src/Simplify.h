@@ -82,3 +82,102 @@ std::string get_hash(const OperatorTerm& t) {
   sort(sz.begin(),sz.end());
   return join(sz,"|");
 }
+
+std::string get_pair_key(const QuarkBilinear& qbi, int i) {
+  int N = (int)qbi.lines.size()-2;
+  assert(i < N);
+  int ip = (i + 1) % N;
+  return join(qbi.lines[i+1]," ") + "|" + join(qbi.lines[ip+1]," ");
+}
+
+void bilinear_from_pair(QuarkBilinear& qbi, std::string key) {
+  auto a = split(key,'|');
+  for (auto x : a) {
+    auto b = split(x,' ');
+    std::vector<std::string> r;
+    for (auto y : b) {
+      if (y.size())
+	r.push_back(y);
+    }
+    qbi.lines.push_back(r);
+  }
+}
+
+void replace_pair(QuarkBilinear& qbi, std::string key, std::string tag) {
+
+  // only work on traces
+  if (qbi.lines[0][0].compare("BEGINTRACE"))
+    return;
+
+  int N=(int)qbi.lines.size()-2;
+  for (int i=0;i<N;i++) {
+    if (!get_pair_key(qbi,i).compare(key)) {
+      qbi.lines.erase(qbi.lines.begin() + i + 1);
+      if (i==N - 1)
+	qbi.lines[0+1] = { "EVAL", tag };
+      else
+	qbi.lines[i+1] = { "EVAL", tag };
+      i--;
+      N--;
+    }
+  }
+}
+
+void add_pair_counts(std::map<std::string,int>& counts, const QuarkBilinear& qbi) {
+
+  // only work on traces
+  if (qbi.lines[0][0].compare("BEGINTRACE"))
+    return;
+
+  int N=(int)qbi.lines.size()-2;
+  for (int i=0;i<N;i++) {
+    std::string k = get_pair_key(qbi,i);
+    auto j = counts.find(k);
+    if (j==counts.end())
+      counts[k]=1;
+    else
+      counts[k]+=1;
+  }
+}
+
+bool cse_step(std::map<std::string,QuarkBilinear>& defs, int min_occ, int& idx) {
+
+  std::map<std::string,int> counts;
+  for (const auto& c : defs)
+    add_pair_counts(counts,c.second);
+
+  // find max
+  std::string kmax;
+  int nmax = -1;
+  for (const auto& c : counts)
+    if (c.second > nmax) {
+      nmax = c.second;
+      kmax = c.first;
+    }
+
+  if (!mpi_id) {
+    std::cout << "# " << nmax << " occurrences of " << kmax << std::endl;
+  }
+
+  if (nmax < min_occ)
+    return false;
+
+  // create new
+  char tag[256];
+  sprintf(tag,"B%9.9d",idx++);
+  QuarkBilinear qbi;
+  bilinear_from_pair(qbi,kmax);
+
+  // replace all
+  for (auto& c : defs)
+    replace_pair(c.second,kmax,tag);
+
+  // add new
+  defs[tag] = qbi;
+  return true;
+}
+
+void cse_steps(std::map<std::string,QuarkBilinear>& defs, int min_occ) {
+  int idx = 0;
+  while (cse_step(defs,min_occ,idx));
+}
