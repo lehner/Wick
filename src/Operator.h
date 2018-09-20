@@ -47,43 +47,6 @@ public:
     return ret;
   }
 
-  std::map<std::string,QuarkBilinear> cse(const std::string& prefix = "") {
-
-    std::map<std::string,QuarkBilinear> ret;
-    int idx = 0;
-    char tag[1024];
-    int repeat = 0, unique = 0;
-    for (auto& i : t) {
-      for (auto & qb : i.qbi) {
-	if (qb.lines.size() && qb.lines[0].size() && !qb.lines[0][0].compare("BEGINTRACE")) {
-	  bool has = false;
-	  for (auto & ex : ret) {
-	    if (match(ex.second,qb)) {
-	      has = true;
-	      qb.lines.clear();
-	      qb.lines.push_back({ "EVAL", ex.first });
-	      repeat++;
-	      break;
-	    }
-	  }
-	  if (!has) {
-	    sprintf(tag,"CS%5.5d",idx++);
-	    std::string st = prefix + tag;
-	    ret[st] = qb;
-	    qb.lines.clear();
-	    qb.lines.push_back({ "EVAL", st });
-	    unique++;
-	  }
-	}
-      }
-    }
-
-    if (!mpi_id) {
-      std::cout << "# cse found " << unique << " unique out of " << (unique + repeat) << " total traces" << std::endl;
-    }
-    return ret;
-  }
-
   void simplify_with_heuristics() {
     // first perform O(N) operation to find potential matches
     std::vector<Operator> grps = split_by_hash();
@@ -170,3 +133,41 @@ public:
   }
 
 };
+
+void cse(std::map<std::string,QuarkBilinear>& ret, std::vector<Operator>& ops) {
+  
+  int idx = 0;
+  char tag[1024];
+  int repeat = 0, unique = 0;
+
+  for (auto& op : ops) {
+    for (auto& i : op.t) {
+      for (auto & qb : i.qbi) {
+	if (qb.lines.size() && qb.lines[0].size() && !qb.lines[0][0].compare("BEGINTRACE")) {
+	  bool has = false;
+	  for (auto & ex : ret) {
+	    if (match(ex.second,qb)) {
+	      has = true;
+	      qb.lines.clear();
+	      qb.lines.push_back({ "EVAL", ex.first });
+	      repeat++;
+	      break;
+	    }
+	  }
+	  if (!has) {
+	    sprintf(tag,"CS%5.5d",idx++);
+	    std::string st = tag;
+	    ret[st] = qb;
+	    qb.lines.clear();
+	    qb.lines.push_back({ "EVAL", st });
+	    unique++;
+	  }
+	}
+      }
+    }
+  }
+
+  if (!mpi_id) {
+    std::cout << "# cse found " << unique << " unique out of " << (unique + repeat) << " total traces" << std::endl;
+  }
+}

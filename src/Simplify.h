@@ -181,3 +181,5 @@ void cse_steps(std::map<std::string,QuarkBilinear>& defs, int min_occ) {
   int idx = 0;
   while (cse_step(defs,min_occ,idx));
 }
+
+
