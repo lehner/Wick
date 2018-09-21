@@ -105,6 +105,9 @@ int main(int argc, char* argv[]) {
 	if (!mpi_id)
 	  printf("# invert hints\n");
 	invert_hints=true;
+      } else {
+	fprintf(stderr,"Unknown command %s\n",argv[i]);
+	return 1;
       }
     }
     

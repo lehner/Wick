@@ -62,6 +62,22 @@ bool hints_match(T& a, T& b) {
   return true;
 }
 
+Operator load(char* cmd) {
+  if (cmd[0]!='@') {
+    FileParser p(cmd);
+    return Operator(p);
+  }
+  auto a = split(std::string(&cmd[1]),'@');
+  assert(a.size()%3==0);
+
+  Operator ret;
+  for (int i=0;i<(int)a.size();i+=3) {
+    Complex scale = Complex(atof(a[i+0].c_str()),atof(a[i+1].c_str()));
+    FileParser p(a[i+2].c_str());
+    ret += scale * Operator(p);
+  }
+  return ret;
+}
 int main(int argc, char* argv[]) {
   if (argc < 2)
     return 1;
@@ -78,14 +94,18 @@ int main(int argc, char* argv[]) {
   }
   nops--;
   for (i=nops+1;i<argc;i++) {
-    if (!strcmp(argv[i],"--nocse"))
+    if (!strcmp(argv[i],"--nocse")) {
       do_cse=false;
+    } else {
+      fprintf(stderr,"Unknown command %s\n",argv[i]);
+      return 1;
+    }
+      
   }
 
   std::vector<Operator> ops;
   for (i=0;i<nops;i++) {
-    FileParser p(argv[1+i]);
-    ops.push_back(Operator(p));
+    ops.push_back(load(argv[1+i]));
   }
 
   for (i=0;i<nops;i++) {

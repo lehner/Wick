@@ -24,6 +24,12 @@ public:
   Operator() {
   }
 
+  Operator& operator+=(const Operator& o) {
+    for (auto& ot : o.t)
+      t.push_back(ot);
+    return *this;
+  }
+
   template<typename F>
   void apply_bilinear(F f) {
     for (auto& i : t) {
@@ -155,7 +161,7 @@ void cse(std::map<std::string,QuarkBilinear>& ret, std::vector<Operator>& ops) {
 	    }
 	  }
 	  if (!has) {
-	    sprintf(tag,"CS%5.5d",idx++);
+	    sprintf(tag,"CS%7.7d",idx++);
 	    std::string st = tag;
 	    ret[st] = qb;
 	    qb.lines.clear();
@@ -170,4 +176,14 @@ void cse(std::map<std::string,QuarkBilinear>& ret, std::vector<Operator>& ops) {
   if (!mpi_id) {
     std::cout << "# cse found " << unique << " unique out of " << (unique + repeat) << " total traces" << std::endl;
   }
+}
+
+Operator operator*(Complex s, const Operator& o) {
+  Operator r;
+  for (auto& t : o.t) {
+    OperatorTerm ot = t;
+    ot.factor *= s;
+    r.t.push_back(ot);
+  }
+  return r;
 }
