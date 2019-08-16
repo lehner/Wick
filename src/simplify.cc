@@ -73,8 +73,16 @@ Operator load(char* cmd) {
   Operator ret;
   for (int i=0;i<(int)a.size();i+=3) {
     Complex scale = Complex(atof(a[i+0].c_str()),atof(a[i+1].c_str()));
-    FileParser p(a[i+2].c_str());
-    ret += scale * Operator(p);
+
+    auto pf = split(a[i+2],'|');
+    assert(pf.size() > 0);
+    FileParser p0(pf[0].c_str());
+    Operator op = Operator(p0);
+    for (int j=1;j<(int)pf.size();j++) {
+      FileParser pj(pf[j].c_str());
+      op = op*Operator(pj);
+    }
+    ret += scale * op;
   }
   return ret;
 }

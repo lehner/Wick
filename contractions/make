@@ -3,6 +3,7 @@
 ops=(
 "lvec"
 "svec"
+"stvec"
 "2piI1_P100"
 "2piI1_P110"
 "2piI1_P111"
@@ -12,6 +13,7 @@ ops=(
 files=(
 "vec"
 "vec"
+"tvec"
 "2piI1_P100"
 "2piI1_P110"
 "2piI1_P111"
@@ -20,6 +22,7 @@ files=(
 
 args=(
 ""
+'--replace_POS local \\\"\\\"'
 '--replace_POS local \\\"\\\"'
 '--replace_POS local \\\"\\\"'
 '--replace_POS local \\\"\\\"'
@@ -49,7 +52,7 @@ do
 		dst=000_T1M_${m}
 
 		mkdir -p $dst
-		eval "exe=\"../wick ../operators/${fileL}.$dst ../operators/${fileR}.$dst $argL $argR --replace_right t t0 --avoid_source t\""
+		eval "exe=\"../wick ../operators/${fileL}.$dst ../operators/${fileR}.$dst $argL $argR --replace_right t t0 --avoid_source t --ignore_hints\""
 		echo $exe
 		eval "$exe > $dst/${opL}-${opR}.contr"
 		cat $dst/${opL}-${opR}.contr | awk 'BEGIN{ hasTsrc=0; }{

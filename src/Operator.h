@@ -30,6 +30,16 @@ public:
     return *this;
   }
 
+  Operator operator*(const Operator& o) {
+    Operator ret;
+    for (auto& t1 : t) {
+      for (auto& t2 : o.t) {
+	ret.t.push_back(t1*t2);
+      }
+    }
+    return ret;
+  }
+
   template<typename F>
   void apply_bilinear(F f) {
     for (auto& i : t) {

@@ -47,6 +47,8 @@ public:
 
   FileParser(const char* fn) : pos(0) {
     FILE* f = fopen(fn,"rt");
+    if (!f)
+      fprintf(stderr,"Could not open file %s\n",fn);
     assert(f);
     char line[2048];
     while (!feof(f)) {

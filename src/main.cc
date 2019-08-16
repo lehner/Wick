@@ -94,9 +94,11 @@ int main(int argc, char* argv[]) {
       if (!strcmp(argv[i],"--replace_right")) {
 	assert(i+2 < argc);
 	p2.replace(argv[i+1],argv[i+2]);
+	i+=2;
       } else if (!strcmp(argv[i],"--replace_left")) {
 	assert(i+2 < argc);
 	p1.replace(argv[i+1],argv[i+2]);
+	i+=2;
       } else if (!strcmp(argv[i],"--ignore_hints")) {
 	if (!mpi_id)
 	  printf("# ignore hints\n");
@@ -105,6 +107,8 @@ int main(int argc, char* argv[]) {
 	if (!mpi_id)
 	  printf("# invert hints\n");
 	invert_hints=true;
+      } else if (!strcmp(argv[i],"--avoid_source")) {
+	i++; // treat later
       } else {
 	fprintf(stderr,"Unknown command %s\n",argv[i]);
 	return 1;
