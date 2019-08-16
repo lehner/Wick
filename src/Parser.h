@@ -36,6 +36,10 @@ public:
   void replace(const char* a, const char* b) {
     for (auto& i : cmds) {
       for (auto& j : i) {
+	if (!strncmp(j.c_str(),"EVAL",4)) {
+	  fprintf(stderr,"Cannot use replace if EVAL* is used!\n");
+	  exit(3);
+	}
         if (!strcmp(a,j.c_str()))
           j=b;
       }

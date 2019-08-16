@@ -190,7 +190,11 @@ QuarkBilinear timerev(QuarkBilinear in, Complex& fac) {
       }
     } else if (strcmp(c,"MOM") == 0) {
       out.lines.push_back(l);
+    } else if (strcmp(c,"EVALM") == 0) {
+      out.lines.push_back(l);
     } else if (strcmp(c,"GAMMA") == 0) {
+      out.lines.push_back(l);
+    } else if (strcmp(c,"EVALMDAG") == 0) {
       out.lines.push_back(l);
     } else if (strcmp(c,"MOMDAG") == 0) {
       out.lines.push_back(l);

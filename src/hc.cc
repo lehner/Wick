@@ -173,10 +173,16 @@ QuarkBilinear hc(QuarkBilinear in, Complex& fac) {
     } else if (strcmp(c,"MOM") == 0) {
       l[0] = l[0] + "DAG";
       out.lines.insert(out.lines.begin(),l);
+    } else if (strcmp(c,"EVALM") == 0) {
+      l[0] = l[0] + "DAG";
+      out.lines.insert(out.lines.begin(),l);
     } else if (strcmp(c,"GAMMA") == 0) {
       out.lines.insert(out.lines.begin(),l); // all the gammas are hermitian
     } else if (strcmp(c,"MOMDAG") == 0) {
       l[0] = l[0].substr(0,3);
+      out.lines.insert(out.lines.begin(),l);
+    } else if (strcmp(c,"EVALMDAG") == 0) {
+      l[0] = l[0].substr(0,5);
       out.lines.insert(out.lines.begin(),l);
     } else {
       std::cout<<"Unknown " << l[0] << std::endl;
