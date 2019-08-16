@@ -1,7 +1,10 @@
-all: wick simplify hc tr cseop
+all: wick simplify hc tr cseop replace
 
 wick: src/main.cc
 	mpiicpc -o wick -O3 -std=c++11 src/main.cc
+
+replace: src/replace.cc
+	mpiicpc -o replace -O3 -std=c++11 src/replace.cc
 
 simplify: src/simplify.cc
 	mpiicpc -o simplify -O3 -std=c++11 src/simplify.cc
