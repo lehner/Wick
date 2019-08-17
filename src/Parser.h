@@ -54,7 +54,7 @@ public:
     if (!f)
       fprintf(stderr,"Could not open file %s\n",fn);
     assert(f);
-    char line[2048];
+    char line[10*1024];
     while (!feof(f)) {
       if (!fgets(line,sizeof(line),f))
         break;
