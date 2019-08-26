@@ -87,6 +87,7 @@ std::string get_pair_key(const QuarkBilinear& qbi, int i) {
   int N = (int)qbi.lines.size()-2;
   assert(i < N);
   int ip = (i + 1) % N;
+  assert(i != ip); // should never happen / just checks if N==1
   return join(qbi.lines[i+1]," ") + "|" + join(qbi.lines[ip+1]," ");
 }
 
@@ -111,6 +112,8 @@ void replace_pair(QuarkBilinear& qbi, std::string key, std::string tag) {
 
   int N=(int)qbi.lines.size()-2;
   for (int i=0;i<N;i++) {
+    if (N<2)
+      break;
     if (!get_pair_key(qbi,i).compare(key)) {
       qbi.lines.erase(qbi.lines.begin() + i + 1);
       if (i==N - 1)
@@ -130,6 +133,9 @@ void add_pair_counts(std::map<std::string,int>& counts, const QuarkBilinear& qbi
     return;
 
   int N=(int)qbi.lines.size()-2;
+  if (N<2)
+    return;
+
   for (int i=0;i<N;i++) {
     std::string k = get_pair_key(qbi,i);
     auto j = counts.find(k);
