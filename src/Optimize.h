@@ -47,6 +47,20 @@ bool is_prop_ls(std::vector<std::string>& c, std::string& t0, std::string& t1) {
   return true;
 }
 
+bool is_prop_ll(std::vector<std::string>& c, std::string& t0, std::string& t1) {
+  if (c.size() != 5)
+    return false;
+  if (!is_prop_type(c[0]))
+    return false;
+  if (c[2].compare("local"))
+    return false;
+  if (c[4].compare("local"))
+    return false;
+  t0 = c[1];
+  t1 = c[3];
+  return true;
+}
+
 bool is_gamma(std::vector<std::string>& c, std::string& mu) {
   if (c.size() != 2)
     return false;
@@ -86,6 +100,20 @@ void replace_combined_operators(QuarkBilinear& qbi) {
         qbi.lines[1+i] = op;
         qbi.lines[1+ip] = hash;
         qbi.lines[1+ipp] = hash;
+      }
+
+      if (is_prop_ll(qbi.lines[1+i],t0,t1) &&
+	  t0.compare(t1) == 0 &&
+	  is_gamma(qbi.lines[1+ip],mu) && n == 2) {
+        std::vector< std::string > op;
+        op.push_back(qbi.lines[1+i][0] + "_LTADPOLE");
+        op.push_back(t0);
+        op.push_back(mu);
+
+        qbi.lines[0] = op;
+        qbi.lines[1] = hash;
+	qbi.lines[2] = hash;
+	qbi.lines[3] = hash;
       }
 
     }
