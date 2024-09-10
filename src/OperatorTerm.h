@@ -53,8 +53,10 @@ public:
 
   OperatorTerm(FileParser& p) {
 
-    if (!p.is("FACTOR"))
+    if (!p.is("FACTOR")) {
+      fprintf(stderr,"Expected FACTOR\n");
       throw ParserSpeculationFail();
+    }
 
     // get factor
     if (p.nargs()==2) {

@@ -15,5 +15,11 @@ cseop: src/cseop.cc
 hc: src/hc.cc
 	mpicxx -o hc -O3 -std=c++11 src/hc.cc
 
+isospin: src/isospin.cc
+	mpicxx -o isospin -O3 -std=c++11 src/isospin.cc
+
+cc: src/cc.cc
+	mpicxx -o cc -O3 -std=c++11 src/cc.cc
+
 tr: src/tr.cc
 	mpicxx -o tr -O3 -std=c++11 src/tr.cc

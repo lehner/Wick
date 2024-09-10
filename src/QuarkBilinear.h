@@ -36,6 +36,8 @@ public:
       do {
         lines.push_back(p.get());
       } while (!p.was("ENDTRACE"));
+    } else if (p.is("LIGHT_LTADPOLE")) {
+      lines.push_back(p.get());
     } else {
       throw ParserSpeculationFail();
     }
